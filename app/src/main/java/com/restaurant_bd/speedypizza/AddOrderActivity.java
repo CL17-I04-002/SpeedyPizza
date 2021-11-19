@@ -38,10 +38,12 @@ public class AddOrderActivity extends AppCompatActivity {
 
 
         ///POST
-        Mesa m = new Mesa();
+        /*Mesa m = new Mesa();
         m.setCodigo("Mesa6");
         bt_aceptar = (ImageView) findViewById(R.id.btn_aceptar);
         Call<Mesa> callPostMesa = MesaAdapter.getApiServiceMesa().setMesa(m);
+
+        ///GENERAR UNA VARIABLE QUE ALMACENE new Callback<Mesa>() Y SOLO INVOCAR DICHA VARIABLE PARA OPTIMIZAR EL CÓDIGO
         callPostMesa.enqueue(new Callback<Mesa>() {
             @Override
             public void onResponse(Call<Mesa> call, Response<Mesa> response) {
@@ -62,44 +64,16 @@ public class AddOrderActivity extends AppCompatActivity {
             public void onFailure(Call<Mesa> call, Throwable t) {
                 Toast.makeText(AddOrderActivity.this, "" + t.getMessage(), Toast.LENGTH_LONG).show();
             }
-        });
-
-
+        });*/
 
 
 
         ///GET
         Call<List<Mesa>> callMesa = MesaAdapter.getApiServiceMesa().getMesa();
-        callMesa.enqueue(new Callback<List<Mesa>>() {
-            @Override
-            public void onResponse(Call<List<Mesa>> call, Response<List<Mesa>> response) {
-                if(response.isSuccessful()){
-                    ///Obtenemos la respuesta del servidor
-                    listaMesa = response.body();
-                    ArrayAdapter<Mesa> adapter = new ArrayAdapter<Mesa>(AddOrderActivity.this, android.R.layout.simple_dropdown_item_1line, listaMesa);
-                    textView = (AutoCompleteTextView) findViewById(R.id.menu);
-                    textView.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
-
-                    textView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-                        @Override
-                        public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3){
-                            mSelected = (Mesa) arg0.getAdapter().getItem(arg2);
-                            Toast.makeText(AddOrderActivity.this, "Clicked " + arg2 + " codigo: " + mSelected.getId(), Toast.LENGTH_SHORT).show();
+        callMesa.enqueue(getMesasCallback);
 
 
-                        }
-                    });
-                }else{
-                    Toast.makeText(AddOrderActivity.this, "Error: " + response.code(), Toast.LENGTH_LONG).show();
-                }
-            }
 
-            @Override
-            public void onFailure(Call<List<Mesa>> call, @NonNull Throwable t) {
-                Toast.makeText(AddOrderActivity.this, "" + t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
 
         ImageView btnAgregar  = findViewById(R.id.btn_agregar);
         btnAgregar.setOnClickListener(v -> {
@@ -107,8 +81,40 @@ public class AddOrderActivity extends AppCompatActivity {
         });
 
        /* ImageView btnAceptar  = findViewById(R.id.btn_aceptar);
-        btnAceptar.setOnClickListener(v -> {
+        btnAceptar.setOnClx ickListener(v -> {
             finish();
         });*/
     }
+
+
+    private final Callback<List<Mesa>> getMesasCallback = new Callback<List<Mesa>>() {
+        @Override
+        public void onResponse(Call<List<Mesa>> call, Response<List<Mesa>> response) {
+            if(response.isSuccessful()){
+
+                listaMesa = response.body();
+                ArrayAdapter<Mesa> adapter = new ArrayAdapter<Mesa>(AddOrderActivity.this, android.R.layout.simple_dropdown_item_1line, listaMesa);
+                textView = (AutoCompleteTextView) findViewById(R.id.menu);
+                textView.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+
+                textView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+                    @Override
+                    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3){
+                        mSelected = (Mesa) arg0.getAdapter().getItem(arg2);
+                        Toast.makeText(AddOrderActivity.this, "Clicked " + arg2 + " codigo: " + mSelected.getId(), Toast.LENGTH_SHORT).show();
+
+
+                    }
+                });
+            }else{
+                Toast.makeText(AddOrderActivity.this, "Error: " + response.code(), Toast.LENGTH_LONG).show();
+            }
+        }
+
+        @Override
+        public void onFailure(Call<List<Mesa>> call, @NonNull Throwable t) {
+            Toast.makeText(AddOrderActivity.this, "" + t.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    };
 }
